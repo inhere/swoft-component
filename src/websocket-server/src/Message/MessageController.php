@@ -24,13 +24,21 @@ abstract class MessageController implements HandlerInterface
     protected $dispatcher;
 
     /** @var string */
-    protected $parserDriver = 'json';
+    protected $defaultParser = JsonParser::class;
 
     public function init()
     {
         $this->setParser(new JsonParser());
 
         $this->dispatcher = new MessageDispatcher($this->registerCommands());
+    }
+
+    protected function configure()
+    {
+        /*
+         pingInterval: 10000,
+         pingTimeout: 5000,
+         */
     }
 
     // protected function registerOperators(): array

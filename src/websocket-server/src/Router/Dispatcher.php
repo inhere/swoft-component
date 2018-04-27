@@ -5,6 +5,7 @@ namespace Swoft\WebSocket\Server\Router;
 use Swoft\Core\ErrorHandler;
 use Swoft\Http\Message\Server\Request;
 use Swoft\Http\Message\Server\Response;
+use Swoft\WebSocket\Server\Exception\ContextLostException;
 use Swoft\WebSocket\Server\HandlerInterface;
 use Swoft\WebSocket\Server\Exception\WsMessageException;
 use Swoft\WebSocket\Server\Exception\WsRouteException;
@@ -86,14 +87,14 @@ class Dispatcher
      * @param Frame $frame
      * @throws \InvalidArgumentException
      * @throws \Swoft\WebSocket\Server\Exception\WsRouteException
-     * @throws \Swoft\WebSocket\Server\Exception\WsMessageException
+     * @throws \Swoft\WebSocket\Server\Exception\ContextLostException
      */
     public function message(Server $server, Frame $frame)
     {
         $fd = $frame->fd;
 
         if (!$path = WebSocketContext::getMeta('path', $fd)) {
-            throw new WsMessageException("The connection info has lost of the fd $fd");
+            throw new ContextLostException("The connection info has lost of the fd $fd");
         }
 
         list($className, ) = $this->getHandler($path);
@@ -109,12 +110,12 @@ class Dispatcher
      * @param int $fd
      * @throws \InvalidArgumentException
      * @throws \Swoft\WebSocket\Server\Exception\WsRouteException
-     * @throws \Swoft\WebSocket\Server\Exception\WsMessageException
+     * @throws \Swoft\WebSocket\Server\Exception\ContextLostException
      */
     public function close(Server $server, int $fd)
     {
         if (!$path = WebSocketContext::getMeta('path', $fd)) {
-            throw new WsMessageException("The connection info has lost of the fd $fd");
+            throw new ContextLostException("The connection info has lost of the fd $fd");
         }
 
         list($className, ) = $this->getHandler($path);
