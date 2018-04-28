@@ -13,22 +13,16 @@ namespace Swoft\DataParser;
  * @package Swoft\DataParser
  * @author inhere <in.798@qq.com>
  */
-class JsonParser implements ParserInterface
+class JsonParser extends AbstractDataParser
 {
     /**
-     * @var bool
+     * class constructor.
+     * @param array $encodeOpts
+     * @param array $decodeOpts
      */
-    protected $assoc = true;
-
-    /**
-     * JsonParser constructor.
-     * @param null $assoc
-     */
-    public function __construct($assoc = null)
+    public function __construct(array $encodeOpts = [], array $decodeOpts = [])
     {
-        if ($assoc !== null) {
-            $this->setAssoc($assoc);
-        }
+        parent::__construct($encodeOpts, $decodeOpts ?: [true]);
     }
 
     /**
@@ -37,7 +31,7 @@ class JsonParser implements ParserInterface
      */
     public function encode($data): string
     {
-        return \json_encode($data);
+        return \json_encode($data, ...$this->encodeOpts);
     }
 
     /**
@@ -46,22 +40,6 @@ class JsonParser implements ParserInterface
      */
     public function decode(string $data)
     {
-        return \json_decode($data, $this->assoc);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAssoc(): bool
-    {
-        return $this->assoc;
-    }
-
-    /**
-     * @param bool $assoc
-     */
-    public function setAssoc($assoc)
-    {
-        $this->assoc = (bool)$assoc;
+        return \json_decode($data, ...$this->decodeOpts);
     }
 }

@@ -6,8 +6,10 @@ namespace Swoft\DataParser;
  * Class MsgPackParser
  * @package Swoft\DataParser
  * @author inhere <in.798@qq.com>
+ * @link https://github.com/msgpack/msgpack-php php-ext
+ * @link https://github.com/rybakit/msgpack.php php
  */
-class MsgPackParser implements ParserInterface
+class MsgPackParser extends AbstractDataParser
 {
     /**
      * class constructor.
@@ -18,6 +20,8 @@ class MsgPackParser implements ParserInterface
         if (!\function_exists('msgpack_pack')) {
             throw new \RuntimeException("The php extension 'msgpack' is required!");
         }
+
+        parent::__construct();
     }
 
     /**

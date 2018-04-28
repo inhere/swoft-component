@@ -13,7 +13,7 @@ namespace Swoft\DataParser;
  * @package Swoft\DataParser
  * @author inhere <in.798@qq.com>
  */
-class PhpParser implements ParserInterface
+class PhpParser implements DataParserInterface
 {
     /**
      * @param mixed $data

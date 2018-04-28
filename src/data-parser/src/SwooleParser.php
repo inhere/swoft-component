@@ -10,17 +10,20 @@ use Swoole\Serialize;
  * @author inhere <in.798@qq.com>
  * @link https://wiki.swoole.com/wiki/page/p-serialize.html
  */
-class SwooleParser implements ParserInterface
+class SwooleParser extends AbstractDataParser
 {
     /**
      * class constructor.
+     * @param array $encodeOpts
      * @throws \RuntimeException
      */
-    public function __construct()
+    public function __construct(array $encodeOpts = [])
     {
         if (!\class_exists(Serialize::class, false)) {
             throw new \RuntimeException("The php extension 'swoole_serialize' is required!");
         }
+
+        parent::__construct($encodeOpts);
     }
 
     /**

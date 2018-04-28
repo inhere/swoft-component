@@ -9,11 +9,11 @@
 namespace Swoft\DataParser;
 
 /**
- * Interface ParserInterface
+ * Interface DataParserInterface
  * @package Swoft\DataParser
  * @author inhere <in.798@qq.com>
  */
-interface ParserInterface
+interface DataParserInterface
 {
     /**
      * @param mixed $data
