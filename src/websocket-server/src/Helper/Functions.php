@@ -1,7 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2018/3/18
- * Time: 下午11:57
- */
+
+use Swoft\WebSocket\Server\SocketIO\SocketIO;
+
+if (!function_exists('sio')) {
+    /**
+     * @param int|null $fd
+     * @return SocketIO
+     */
+    function sio(int $fd = null): SocketIO
+    {
+        return new SocketIO($fd);
+    }
+}

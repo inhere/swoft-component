@@ -35,7 +35,7 @@ class ServerStartListener implements WorkerStartInterface
      */
     public function onWorkerStart(Server $server, int $workerId, bool $isWorker)
     {
-        if (!$enable = \config('devtool.enable', false)) {
+        if (!$enable = \config('debug', false)) {
             return;
         }
 

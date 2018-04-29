@@ -12,7 +12,7 @@ trait DataParserAwareTrait
     /**
      * @var DataParserInterface
      */
-    private $parser;
+    protected $parser;
 
     /**
      * @return DataParserInterface

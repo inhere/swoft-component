@@ -2,12 +2,13 @@
 
 namespace Swoft\WebSocket\Server\Router;
 
+use Swoft\App;
 use Swoft\Core\ErrorHandler;
 use Swoft\Http\Message\Server\Request;
 use Swoft\Http\Message\Server\Response;
+use Swoft\WebSocket\Server\Event\WsEvent;
 use Swoft\WebSocket\Server\Exception\ContextLostException;
 use Swoft\WebSocket\Server\HandlerInterface;
-use Swoft\WebSocket\Server\Exception\WsMessageException;
 use Swoft\WebSocket\Server\Exception\WsRouteException;
 use Swoft\WebSocket\Server\WebSocketContext;
 use Swoole\WebSocket\Frame;
@@ -32,7 +33,7 @@ class Dispatcher
     {
         try {
             $path = $request->getUri()->getPath();
-            list($className, ) = $this->getHandler($path);
+            list($className,) = $this->getHandler($path);
         } catch (\Throwable $e) {
             /* @var ErrorHandler $errorHandler */
             // $errorHandler = \bean(ErrorHandler::class);
@@ -71,7 +72,7 @@ class Dispatcher
     public function open(Server $server, Request $request, int $fd)
     {
         $path = $request->getUri()->getPath();
-        list($className, ) = $this->getHandler($path);
+        list($className,) = $this->getHandler($path);
 
         /** @var HandlerInterface $handler */
         $handler = \bean($className);
@@ -93,15 +94,26 @@ class Dispatcher
     {
         $fd = $frame->fd;
 
-        if (!$path = WebSocketContext::getMeta('path', $fd)) {
-            throw new ContextLostException("The connection info has lost of the fd $fd");
+        try {
+            if (!$path = WebSocketContext::getMeta('path', $fd)) {
+                throw new ContextLostException("The connection info has lost of the fd#$fd, on message");
+            }
+
+            $className = $this->getHandler($path)[0];
+
+            /** @var HandlerInterface $handler */
+            $handler = \bean($className);
+            $handler->onMessage($server, $frame);
+        } catch (\Throwable $e) {
+            /** @var \Swoft\Event\EventManager $em */
+            $em = App::getBean('eventManager');
+
+            if ($em->hasListenerQueue(WsEvent::ON_ERROR)) {
+                App::trigger(WsEvent::ON_ERROR, $frame, $e);
+            } else {
+                App::error($e->getMessage(), ['fd' => $fd, 'data' => $frame->data]);
+            }
         }
-
-        list($className, ) = $this->getHandler($path);
-
-        /** @var HandlerInterface $handler */
-        $handler = \bean($className);
-        $handler->onMessage($server, $frame);
     }
 
     /**
@@ -114,17 +126,23 @@ class Dispatcher
      */
     public function close(Server $server, int $fd)
     {
-        if (!$path = WebSocketContext::getMeta('path', $fd)) {
-            throw new ContextLostException("The connection info has lost of the fd $fd");
-        }
+        try {
+            if (!$path = WebSocketContext::getMeta('path', $fd)) {
+                throw new ContextLostException(
+                    "The connection info has lost of the fd#$fd, on connection closed"
+                );
+            }
 
-        list($className, ) = $this->getHandler($path);
+            $className = $this->getHandler($path)[0];
 
-        /** @var HandlerInterface $handler */
-        $handler = \bean($className);
+            /** @var HandlerInterface $handler */
+            $handler = \bean($className);
 
-        if (\method_exists($handler, 'onClose')) {
-            $handler->onClose($server, $fd);
+            if (\method_exists($handler, 'onClose')) {
+                $handler->onClose($server, $fd);
+            }
+        } catch (\Throwable $e) {
+            App::error($e->getMessage(), ['fd' => $fd]);
         }
     }
 
@@ -142,7 +160,7 @@ class Dispatcher
 
         if ($status !== HandlerMapping::FOUND) {
             throw new WsRouteException(sprintf(
-                'The requested websocket route "%s" path is not exist! ',
+                'The requested websocket route "%s" path is not exist!',
                 $path
             ));
         }

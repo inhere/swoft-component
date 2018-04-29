@@ -4,7 +4,7 @@ namespace Swoft\WebSocket\Server\Message;
 
 use Swoft\DataParser\DataParserAwareTrait;
 use Swoft\DataParser\JsonParser;
-use Swoft\DataParser\ParserInterface;
+use Swoft\DataParser\DataParserInterface;
 use Swoft\Http\Message\Server\Request;
 use Swoft\Http\Message\Server\Response;
 use Swoft\WebSocket\Server\HandlerInterface;
@@ -14,7 +14,7 @@ use Swoole\WebSocket\Server;
 /**
  * Class MessageController
  * @package Swoft\WebSocket\Server\Message
- * @property ParserInterface $parser
+ * @property DataParserInterface $parser
  */
 abstract class MessageController implements HandlerInterface
 {
@@ -28,7 +28,9 @@ abstract class MessageController implements HandlerInterface
 
     public function init()
     {
-        $this->setParser(new JsonParser());
+        if (!$this->parser) {
+            $this->setParser(new JsonParser());
+        }
 
         $this->dispatcher = new MessageDispatcher($this->registerCommands());
     }
