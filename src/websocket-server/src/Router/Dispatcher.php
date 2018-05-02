@@ -41,7 +41,7 @@ class Dispatcher
             if ($e instanceof WsRouteException) {
                 return [
                     HandlerInterface::HANDSHAKE_FAIL,
-                    $response->withStatus(404)
+                    $response->withStatus(404)->withAddedHeader('Failed-Reason', 'Route not found')
                 ];
             }
 
