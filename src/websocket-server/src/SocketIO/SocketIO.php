@@ -79,6 +79,7 @@ class SocketIO
     }
 
     /**
+     * @un-complete
      * @param string $path route path(socketIO's namespace)
      * @return $this
      */

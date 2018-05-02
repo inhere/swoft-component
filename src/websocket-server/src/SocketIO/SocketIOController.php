@@ -38,7 +38,6 @@ abstract class SocketIOController implements HandlerInterface
     public function init()
     {
         $this->setParser(new SocketIOParser());
-
         $this->configure();
     }
 
@@ -57,20 +56,20 @@ abstract class SocketIOController implements HandlerInterface
      * @param Server $server
      * @param Frame $frame
      */
-    public function dispatch(Server $server, Frame $frame)
+    public function onMessage(Server $server, Frame $frame)
     {
-        $parser = $this->getParser();
-
-        $parser->decode($frame->data);
+        $this->dispatch($server, $frame);
     }
 
     /**
      * @param Server $server
      * @param Frame $frame
      */
-    public function onMessage(Server $server, Frame $frame)
+    public function dispatch(Server $server, Frame $frame)
     {
-        $this->dispatch($server, $frame);
+        $parser = $this->getParser();
+
+        $data = $parser->decode($frame->data);
     }
 
     public function chatMessage()
