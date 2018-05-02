@@ -112,6 +112,8 @@ class Dispatcher
                 App::trigger(WsEvent::ON_ERROR, $frame, $e);
             } else {
                 App::error($e->getMessage(), ['fd' => $fd, 'data' => $frame->data]);
+                // close connection
+                $server->close($fd);
             }
         }
     }

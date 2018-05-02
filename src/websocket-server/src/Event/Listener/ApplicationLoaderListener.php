@@ -2,11 +2,13 @@
 
 namespace Swoft\WebSocket\Server\Event\Listener;
 
+use Swoft\App;
 use Swoft\Bean\Annotation\Listener;
 use Swoft\Event\AppEvent;
 use Swoft\Event\EventHandlerInterface;
 use Swoft\Event\EventInterface;
 use Swoft\WebSocket\Server\Bean\Collector\WebSocketCollector;
+use Swoft\WebSocket\Server\WebSocketServer;
 
 /**
  * Class ApplicationLoaderListener
@@ -20,8 +22,10 @@ class ApplicationLoaderListener implements EventHandlerInterface
      */
     public function handle(EventInterface $event)
     {
-        /* @var \Swoft\WebSocket\Server\Router\HandlerMapping $router */
-        $router = \bean('wsRouter');
-        $router->registerRoutes(WebSocketCollector::getCollector());
+        // if is ws server. collection ws routes
+        if (WebSocketServer::TYPE_WS === App::$server->getServerType()) {
+            /** @see \Swoft\WebSocket\Server\Router\HandlerMapping::registerRoutes() */
+            \bean('wsRouter')->registerRoutes(WebSocketCollector::getCollector());
+        }
     }
 }
