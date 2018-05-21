@@ -2,11 +2,9 @@
 
 namespace Swoft\WebSocket\Server\SocketIO;
 
-use Swoft\App;
 use Swoft\DataParser\DataParserAwareTrait;
 use Swoft\Http\Message\Server\Request;
 use Swoft\WebSocket\Server\HandlerInterface;
-use Swoft\WebSocket\Server\WebSocketContext;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
@@ -32,6 +30,11 @@ abstract class SocketIOController implements HandlerInterface
      */
     protected $events = [];
 
+    /**
+     * @var string
+     */
+    protected $strategy = '';
+
     /** @var string */
     protected $defaultEvent = 'chatMessage';
 
@@ -50,6 +53,12 @@ abstract class SocketIOController implements HandlerInterface
         $this->events = [
             'chat message' => 'chatMessage'
         ];
+    }
+
+    public function onOpen(Server $server, Request $request, int $fd)
+    {
+        $path = $request->getUri()->getPath();
+        $this->io = \sio($fd)->of($path);
     }
 
     /**
@@ -72,6 +81,20 @@ abstract class SocketIOController implements HandlerInterface
         $data = $parser->decode($frame->data);
     }
 
+
+    public function on(string $name, $callback)
+    {
+
+    }
+
+    public function once(string $name, $callback)
+    {
+
+    }
+
+    /**
+     * @SIOEvent("chat message", once=false)
+     */
     public function chatMessage()
     {
 

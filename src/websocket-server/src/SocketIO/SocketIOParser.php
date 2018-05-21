@@ -11,21 +11,64 @@ use Swoft\Helper\JsonHelper;
  */
 class SocketIOParser extends AbstractDataParser
 {
+    /**
+     * the default data structure
+     */
     const STRUCTURE = [
-        'id' => 0,
         'type' => '',
+        'attachments' => '',
+        'nsp' => '/',
+        'id' => 0,
         'data' => []
+    ];
+
+    const ERROR = [
+        'type' => Packet::ERROR,
+        'data' => 'parse error',
     ];
 
     /**
      * @param mixed $data
      * @return string
+     * @ref https://github.com/walkor/phpsocket.io
      */
     public function encode($data): string
     {
-        $data = (array)$data;
+        $map = (array)$data;
+        $map = \array_merge(self::STRUCTURE, $map);
 
-        JsonHelper::encode($data);
+        $type = (int)$map['type'];
+        $encoded = $map['type'];
+        $hasNsp = $map['nsp'] && $map['nsp'] !== '/';
+
+        if ($type === Packet::BINARY_ACK || $type === Packet::BINARY_EVENT) {
+            $encoded .= $map['attachments'] . '-';
+        }
+
+        if ($hasNsp) {
+            $encoded .= $map['nsp'];
+        }
+
+        // if has nsp(excepted '/'), we append it followed by a comma `,`
+
+        if ($map['id']) {
+            if ($hasNsp) {
+                $hasNsp = false;
+                $encoded .= ',';
+            }
+
+            $encoded .= $map['id'];
+        }
+
+        if ($map['data']) {
+            if ($hasNsp) {
+                $encoded .= ',';
+            }
+
+            $encoded .= \json_encode($map['data']);
+        }
+
+        return $encoded;
     }
 
     /**
@@ -34,11 +77,17 @@ class SocketIOParser extends AbstractDataParser
      */
     public function decode(string $data)
     {
-        $data = \trim($data);
+        $str = \trim($data);
 
         // Not a json map string
-        if ($data[0] !== '{') {
-
+        if ($str[0] !== '{') {
+            $map = [
+                'data' => $str
+            ];
+        } else {
+            $map = JsonHelper::decode($data, true);
         }
+
+        return $map;
     }
 }

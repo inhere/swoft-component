@@ -9,6 +9,17 @@ namespace Swoft\WebSocket\Server\Helper;
 class WSHelper
 {
     /**
+     * @param string $path
+     * @return string
+     */
+    public static function formatPath(string $path): string
+    {
+        $path = \rtrim($path, '/ ');
+
+        return $path ?: '/';
+    }
+
+    /**
      * @param int $fd
      * @param string $prefix
      * @return string (length is 32)

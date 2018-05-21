@@ -41,6 +41,11 @@ class SocketIO
     private $rooms = [];
 
     /**
+     * @var array
+     */
+    private $roomsForSend = [];
+
+    /**
      * SocketIO constructor.
      * @param int $sender
      */
@@ -56,6 +61,30 @@ class SocketIO
     public function from(int $sender): self
     {
         return $this->setSender($sender);
+    }
+
+    /**
+     * 加入分组（一个连接可以加入多个分组）
+     * @param string $room
+     * @return SocketIO
+     */
+    public function join(string $room): self
+    {
+        $this->rooms[] = $room;
+
+        return $this;
+    }
+
+    /**
+     * 离开分组（连接断开时会自动从分组中离开）
+     * @param string $room
+     * @return SocketIO
+     */
+    public function leave(string $room): self
+    {
+        $this->rooms[] = $room;
+
+        return $this;
     }
 
     /**
@@ -88,10 +117,19 @@ class SocketIO
        return $this;
     }
 
+    /**
+     * @param string $event
+     * @param mixed $data
+     */
     public function emit(string $event, $data)
     {
-        // App::$server->push($fd, $data);
+        \ws()->push($this->sender, $data);
 
+        $this->reset();
+    }
+
+    public function send()
+    {
         $this->reset();
     }
 

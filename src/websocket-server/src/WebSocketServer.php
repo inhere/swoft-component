@@ -176,7 +176,7 @@ class WebSocketServer extends HttpServer
     }
 
     /**
-     * broadcast message, will exclude self.
+     * broadcast message, will exclude sender
      * @param string $data 消息数据
      * @param int $sender 发送者
      * @param int[] $receivers 指定接收者们
@@ -194,13 +194,14 @@ class WebSocketServer extends HttpServer
             return $this->sendTo((int)\array_shift($receivers), $data, $sender);
         }
 
+        // excepted itself
+        if ($sender) {
+            $excluded[] = $sender;
+        }
+
         // to all
         if (!$excluded && !$receivers) {
             return $this->sendToAll($data, $sender);
-        }
-
-        if ($sender) {
-            $excluded[] = $sender;
         }
 
         // to some
@@ -289,7 +290,7 @@ class WebSocketServer extends HttpServer
 
             /** @var $fdList array */
             foreach ($fdList as $fd) {
-                if (isset($excluded[$fd])) {
+                if (isset($excluded[$fd]) || !$this->exist($fd)) {
                     continue;
                 }
 
@@ -309,11 +310,11 @@ class WebSocketServer extends HttpServer
      * @param int $fd
      * @param string $data
      * param int $length
-     * @return int   Return error number code. gt 0 on failure, eq 0 on success
+     * @return bool
      */
-    public function writeTo($fd, string $data): int
+    public function writeTo(int $fd, string $data): bool
     {
-        return $this->server->send($fd, $data) ? 0 : 1;
+        return $this->server->send($fd, $data);
     }
 
     /**

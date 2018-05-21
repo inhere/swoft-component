@@ -3,6 +3,7 @@
 namespace Swoft\WebSocket\Server\Router;
 
 use Swoft\Http\Message\Router\HandlerMappingInterface;
+use Swoft\WebSocket\Server\Helper\WSHelper;
 
 
 /**
@@ -59,7 +60,7 @@ class HandlerMapping implements HandlerMappingInterface
      */
     public function match(string $path): array
     {
-        $path = $path === '/' ? $path : \rtrim($path, '/ ');
+        $path = WSHelper::formatPath($path);
 
         if (!isset($this->routes[$path])) {
             return [self::NOT_FOUND, $path];
@@ -86,7 +87,7 @@ class HandlerMapping implements HandlerMappingInterface
      */
     private function registerRoute(string $path, $handler, array $option = [])
     {
-        $path = '/' . \trim($path, '/ ');
+        $path = WSHelper::formatPath($path);
 
         $this->routes[$path] = [
             'handler' => $handler,
