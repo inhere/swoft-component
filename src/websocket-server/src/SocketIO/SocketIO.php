@@ -3,6 +3,7 @@
 namespace Swoft\WebSocket\Server\SocketIO;
 
 use Swoft\App;
+use Swoft\WebSocket\Server\Storage\AbstractStorage;
 use Swoft\WebSocket\Server\WebSocketServer;
 
 /**
@@ -44,6 +45,9 @@ class SocketIO
      * @var array
      */
     private $roomsForSend = [];
+
+    /** @var AbstractStorage store */
+    protected $storage;
 
     /**
      * SocketIO constructor.

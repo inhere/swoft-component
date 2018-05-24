@@ -5,6 +5,7 @@ namespace Swoft\WebSocket\Server\SocketIO;
 use Swoft\DataParser\DataParserAwareTrait;
 use Swoft\Http\Message\Server\Request;
 use Swoft\WebSocket\Server\HandlerInterface;
+use Swoft\WebSocket\Server\Storage\AbstractStorage;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
@@ -34,6 +35,9 @@ abstract class SocketIOController implements HandlerInterface
      * @var string
      */
     protected $strategy = '';
+
+    /** @var AbstractStorage store */
+    protected $storage;
 
     /** @var string */
     protected $defaultEvent = 'chatMessage';
