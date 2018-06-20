@@ -12,49 +12,49 @@ namespace Swoft\Aop;
 
 /**
  * AopTrait
+ * @important All methods in this trait SHOULD ALWAYS NOT import any namespace, fully qualified name of class is required.
  */
 trait AopTrait
 {
-
     /**
-     * Execute origin method by aop
+     * AOP proxy call method
      *
-     * @param string $method The execution method
-     * @param array  $params The parameters of execution method
-     *
-     * @return mixed
-     * @throws \ReflectionException
+     * @param \Closure $closure
+     * @param string   $method
+     * @param array    $params
+     * @return mixed|null
+     * @throws \Throwable
      */
-    public function __proxy(string $method, array $params)
+    public function __proxyCall(\Closure $closure, string $method, array $params)
     {
         /** @var Aop $aop */
-        $aop   = \bean(Aop::class);
+        $aop   = \bean(\Swoft\Aop\Aop::class);
         $map   = $aop->getMap();
         $class = $this->getOriginalClassName();
         // If doesn't have any advices, then execute the origin method
         if (!isset($map[$class][$method]) || empty($map[$class][$method])) {
-            return parent::$method(...$params);
+            return $closure(...$params);
         }
-
         // Apply advices's functionality
         $advices = $map[$class][$method];
 
-        return $this->__doAdvice($method, $params, $advices);
+        return $this->__doAdvice($closure, $method, $params, $advices);
     }
 
     /**
-     * @param string $method  The execution method
-     * @param array  $params  The parameters of execution method
-     * @param array  $advices The advices of this object method
+     * AOP do advice method
      *
-     * @return mixed
+     * @param \Closure $closure
+     * @param string   $method
+     * @param array    $params
+     * @param array    $advices
+     * @return mixed|null
      * @throws \Throwable
      */
-    public function __doAdvice(string $method, array $params, array $advices)
+    public function __doAdvice(\Closure $closure, string $method, array $params, array $advices)
     {
         $result = null;
         $advice = array_shift($advices);
-
         try {
 
             // Around
@@ -67,9 +67,9 @@ trait AopTrait
                     $this->__doPoint($advice['before'], $method, $params, $advice, $advices);
                 }
                 if (0 === \count($advices)) {
-                    $result = parent::$method(...$params);
+                    $result = $closure(...$params);
                 } else {
-                    $this->__doAdvice($method, $params, $advices);
+                    $this->__doAdvice($closure, $method, $params, $advices);
                 }
             }
 
@@ -133,18 +133,18 @@ trait AopTrait
 
             // JoinPoint object
             $type = $parameterType->__toString();
-            if ($type === JoinPoint::class) {
-                $aspectArgs[] = new JoinPoint($this, $method, $args, $return, $catch);
+            if ($type === \Swoft\Aop\JoinPoint::class) {
+                $aspectArgs[] = new \Swoft\Aop\JoinPoint($this, $method, $args, $return, $catch);
                 continue;
             }
 
             // ProceedingJoinPoint object
-            if ($type === ProceedingJoinPoint::class) {
-                $aspectArgs[] = new ProceedingJoinPoint($this, $method, $args, $advice, $advices);
+            if ($type === \Swoft\Aop\ProceedingJoinPoint::class) {
+                $aspectArgs[] = new \Swoft\Aop\ProceedingJoinPoint($this, $method, $args, $advice, $advices);
                 continue;
             }
 
-            //Throwable object
+            // Throwable object
             if (isset($catch) && $catch instanceof $type) {
                 $aspectArgs[] = $catch;
                 continue;
@@ -154,6 +154,4 @@ trait AopTrait
         $aspect = \bean($aspectClass);
         return $aspect->$aspectMethod(...$aspectArgs);
     }
-
-
 }
