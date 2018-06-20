@@ -29,7 +29,7 @@ final class WebSocket
     public static function isInvalidSecWSKey(string $secWSKey): bool
     {
         return 0 === \preg_match(self::KEY_PATTEN, $secWSKey) ||
-               16 !== \strlen(\base64_decode($secWSKey));
+            16 !== \strlen(\base64_decode($secWSKey));
     }
 
     /**

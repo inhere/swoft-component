@@ -45,13 +45,13 @@ class MessageDispatcher
 
         $handler = $this->handlers[$command];
 
-        if (\is_string($handler)){
+        if (\is_string($handler)) {
             if (\method_exists($controller, $handler)) {
                 $controller->$handler($body, $frame);
                 return;
             }
 
-            if(\class_exists($handler)) {
+            if (\class_exists($handler)) {
                 $obj = App::hasBean($handler) ? App::getBean($handler) : new $handler;
 
                 if (\method_exists($obj, 'execute')) {

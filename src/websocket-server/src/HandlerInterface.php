@@ -30,7 +30,7 @@ interface HandlerInterface
      *  $response
      * ]
      */
-    public function checkHandshake(Request $request, Response $response): array ;
+    public function checkHandshake(Request $request, Response $response): array;
 
     /**
      * @param Server $server

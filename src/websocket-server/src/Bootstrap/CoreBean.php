@@ -23,7 +23,7 @@ class CoreBean implements BootBeanInterface
             'wsDispatcher' => [
                 'class' => Dispatcher::class,
             ],
-            'wsRouter'     => [
+            'wsRouter' => [
                 'class' => HandlerMapping::class,
             ],
         ];

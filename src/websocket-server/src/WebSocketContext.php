@@ -19,7 +19,7 @@ class WebSocketContext
      * @var array
      * [
      *  fd => [
-            // metadata
+     * // metadata
      *      'meta' => [
      *          'fd' => fd,
      *          'path' => request path,

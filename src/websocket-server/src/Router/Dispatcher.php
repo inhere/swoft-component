@@ -46,7 +46,7 @@ class Dispatcher
             }
 
             // other error
-            throw new WsException('handshake error: ' . $e->getMessage(),-500, $e);
+            throw new WsException('handshake error: ' . $e->getMessage(), -500, $e);
         }
 
         /** @var HandlerInterface $handler */

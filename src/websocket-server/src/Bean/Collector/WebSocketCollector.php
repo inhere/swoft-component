@@ -21,7 +21,7 @@ class WebSocketCollector implements CollectorInterface
      * @param WebSocket $objectAnnotation
      * @param string $propertyName
      * @param string $methodName
-     * @param null   $propertyValue
+     * @param null $propertyValue
      */
     public static function collect(string $className, $objectAnnotation = null, string $propertyName = '', string $methodName = '', $propertyValue = null)
     {
