@@ -3,9 +3,9 @@
 namespace Swoft\WebSocket\Server\Storage;
 
 /**
- * Class MemoryStorage
+ * Class SwooleStorage
  * @package Swoft\WebSocket\Server\Storage
  */
-class MemoryStorage
+class SwooleStorage
 {
 }
