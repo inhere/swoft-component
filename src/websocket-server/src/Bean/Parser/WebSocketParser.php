@@ -28,7 +28,7 @@ class WebSocketParser extends AbstractParser
     {
         $beanName = $className;
         $scope = Scope::SINGLETON;
-
+\var_dump($className);
         // collect controller
         WebSocketCollector::collect($className, $objectAnnotation, $propertyName, $methodName, $propertyValue);
 

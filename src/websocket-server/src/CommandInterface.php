@@ -14,5 +14,8 @@ namespace Swoft\WebSocket\Server;
  */
 interface CommandInterface
 {
-
+    /**
+     * @return mixed
+     */
+    public function execute();
 }

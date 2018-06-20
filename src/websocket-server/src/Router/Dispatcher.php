@@ -8,6 +8,7 @@ use Swoft\Http\Message\Server\Request;
 use Swoft\Http\Message\Server\Response;
 use Swoft\WebSocket\Server\Event\WsEvent;
 use Swoft\WebSocket\Server\Exception\ContextLostException;
+use Swoft\WebSocket\Server\Exception\WsException;
 use Swoft\WebSocket\Server\HandlerInterface;
 use Swoft\WebSocket\Server\Exception\WsRouteException;
 use Swoft\WebSocket\Server\WebSocketContext;
@@ -27,7 +28,6 @@ class Dispatcher
      * @return array eg. [status, response]
      * @throws \Swoft\WebSocket\Server\Exception\WsRouteException
      * @throws \InvalidArgumentException
-     * @throws \Throwable
      */
     public function handshake(Request $request, Response $response): array
     {
@@ -46,7 +46,7 @@ class Dispatcher
             }
 
             // other error
-            throw $e;
+            throw new WsException('handshake error: ' . $e->getMessage(),-500, $e);
         }
 
         /** @var HandlerInterface $handler */
@@ -143,6 +143,7 @@ class Dispatcher
             }
         } catch (\Throwable $e) {
             App::error($e->getMessage(), ['fd' => $fd]);
+            // App::trigger(WsEvent::ON_ERROR, $fd, $e);
         }
     }
 

@@ -20,11 +20,17 @@ abstract class MessageController implements HandlerInterface
 {
     use DataParserAwareTrait;
 
+    /** @var array */
+    protected $options = [];
+
     /** @var MessageDispatcher */
     protected $dispatcher;
 
     /** @var string */
     protected $defaultParser = JsonParser::class;
+
+    /** @var string */
+    protected $defaultCommand = 'default';
 
     public function init()
     {
@@ -32,15 +38,20 @@ abstract class MessageController implements HandlerInterface
             $this->setParser(new JsonParser());
         }
 
+        $this->options = $this->configure();
         $this->dispatcher = new MessageDispatcher($this->registerCommands());
     }
 
-    protected function configure()
+    /**
+     * @todo
+     * @return array
+     */
+    protected function configure(): array
     {
-        /*
-         pingInterval: 10000,
-         pingTimeout: 5000,
-         */
+        return [
+            'pingInterval' => 10000, // ms
+            'pingTimeout' => 5000, // ms
+        ];
     }
 
     // protected function registerOperators(): array
@@ -48,16 +59,24 @@ abstract class MessageController implements HandlerInterface
     protected function registerCommands(): array
     {
         return [
-            'login' => 'LoginHandler',
-            'message' => 'MessageHandler',
-            'logout' => 'LogoutHandler',
-            'createRoom' => 'CreateRoomHandler',
+            // handler is a method name in the controller, or is a class implement CommandInterface
+            // command name => handler
+            'default' => 'defaultCommand',
+            // 'login' => 'LoginHandler',
+            // 'message' => 'MessageHandler',
+            // 'logout' => 'LogoutHandler',
+            // 'createRoom' => 'CreateRoomHandler',
+            // 'some command' => 'Some::class',
         ];
     }
 
-    protected function messageDispatch()
+    /**
+     * @param mixed $body
+     * @param Frame $frame
+     */
+    public function defaultCommand($body, Frame $frame)
     {
-
+        \ws()->send("hello, we have received your message: $body", $frame->fd);
     }
 
     /**
@@ -81,30 +100,61 @@ abstract class MessageController implements HandlerInterface
 
     /**
      * @param Server $server
-     * @param Request $request
-     * @param int $fd
-     * @return mixed
-     */
-    public function onOpen(Server $server, Request $request, int $fd)
-    {
-        // TODO: Implement onOpen() method.
-    }
-
-    /**
-     * @param Server $server
      * @param Frame $frame
+     * data structure:
+     * [
+     *  'cmd' => 'name', // command name
+     *  'body' => ...    // body data
+     * ]
      */
-    public function onMessage(Server $server, Frame $frame)
+    final public function onMessage(Server $server, Frame $frame)
     {
+        $cmd = $this->defaultCommand;
         $parser = $this->getParser();
 
         if (!$data = $parser->decode($frame->data)) {
-            $server->push($frame->fd, 'your sent data is invalid');
+            $skip = $this->onFormatError($frame);
 
+            if ($skip !== true) {
+                return;
+            }
+
+            $body = $data;
+        } else {
+            $body = $data['body'] ?: [];
+
+            if (isset($data['cmd'])) {
+                $cmd = $data['cmd'];
+            } elseif (!$body) {
+                $body = $data;
+            }
+        }
+
+        if (!$this->beforeDispatch($cmd, $body, $frame)) {
             return;
         }
 
-        $this->dispatcher->dispatch($data['command'], $data['body']);
+        $this->dispatcher->dispatch($this, $cmd, $body, $frame);
+    }
+
+    /**
+     * @param string $cmd
+     * @param array $body
+     * @param Frame $frame
+     * @return bool
+     */
+    protected function beforeDispatch(string $cmd, array $body, Frame $frame): bool
+    {
+        // \ws()->push($frame->fd, 'your sent data is invalid');
+        return true;
+    }
+
+    /**
+     * @param Frame $frame
+     */
+    protected function onFormatError(Frame $frame)
+    {
+        \ws()->push($frame->fd, 'your sent data format is invalid');
     }
 
     /**
@@ -117,5 +167,13 @@ abstract class MessageController implements HandlerInterface
     public function onClose(Server $server, int $fd)
     {
         // TODO: Implement onClose() method.
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

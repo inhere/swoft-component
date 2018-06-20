@@ -24,6 +24,9 @@ class ApplicationLoaderListener implements EventHandlerInterface
     {
         // if is ws server. collection ws routes
         if (WebSocketServer::TYPE_WS === App::$server->getServerType()) {
+
+            \var_dump(WebSocketCollector::getCollector());
+
             /** @see \Swoft\WebSocket\Server\Router\HandlerMapping::registerRoutes() */
             \bean('wsRouter')->registerRoutes(WebSocketCollector::getCollector());
         }

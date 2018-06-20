@@ -2,17 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2018/3/18
- * Time: 下午7:56
+ * Date: 2018/6/20
+ * Time: 上午11:43
  */
 
 namespace Swoft\WebSocket\Server\Exception;
 
 /**
- * Class WsRouteException
+ * Class WsException
  * @package Swoft\WebSocket\Server\Exception
  */
-class WsMessageException extends WsException
+class WsException extends \RuntimeException
 {
 
 }
