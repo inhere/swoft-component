@@ -22,7 +22,8 @@
         "psr/simple-cache": "^1.0.0",
         "seld/phar-utils": "^1.0",
         "text/template": "~2.3",
-        "nesbot/carbon": "^1.26"
+        "nesbot/carbon": "^1.26",
+        "nikic/php-parser": "^4.0"
     },
     "require-dev": {
         "eaglewu/swoole-ide-helper": "dev-master",
@@ -38,6 +39,7 @@
         "swoft/db": "self.version",
         "swoft/defer": "self.version",
         "swoft/devtool": "self.version",
+        "swoft/error-handler": "self.version",
         "swoft/http-client": "self.version",
         "swoft/http-message": "self.version",
         "swoft/http-server": "self.version",
@@ -64,6 +66,7 @@
             "Swoft\\Db\\": "src/db/src/",
             "Swoft\\Defer\\": "src/defer/src/",
             "Swoft\\Devtool\\": "src/devtool/src/",
+            "Swoft\\ErrorHandler\\": "src/error-handler/src/",
             "Swoft\\HttpClient\\": "src/http-client/src/",
             "Swoft\\Http\\Message\\": "src/http-message/src/",
             "Swoft\\Http\\Server\\": "src/http-server/src/",

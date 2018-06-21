@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://doc.swoft.org
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 namespace Swoft\Aop\Bootstrap\Boots;
 
 use Swoft\Aop\Bean\Annotation;
@@ -10,14 +17,12 @@ use Swoft\Aop\Proxy;
 use Swoft\Bean\Annotation\Bootstrap;
 use Swoft\Bootstrap\Boots\Bootable;
 
-
 /**
  * Namespace compatibility with previous versions, which non-componentization version
  * @Bootstrap(order=1)
  */
 class CompPreviousVersionNamespace implements Bootable
 {
-
     /**
      * @return void
      */
@@ -36,15 +41,15 @@ class CompPreviousVersionNamespace implements Bootable
             Parser\PointBeanParser::class       => 'Swoft\Bean\Parser\PointBeanParser',
             Parser\PointExecutionParser::class  => 'Swoft\Bean\Parser\PointExecutionParser',
             Collector\AspectCollector::class    => 'Swoft\Bean\Collector\AspectCollector',
-            Annotation\After::class             => 'Swoft\Bean\Parser\After',
-            Annotation\AfterReturning::class    => 'Swoft\Bean\Parser\AfterReturning',
-            Annotation\AfterThrowing::class     => 'Swoft\Bean\Parser\AfterThrowing',
-            Annotation\Around::class            => 'Swoft\Bean\Parser\Around',
-            Annotation\Aspect::class            => 'Swoft\Bean\Parser\Aspect',
-            Annotation\Before::class            => 'Swoft\Bean\Parser\Before',
-            Annotation\PointAnnotation::class   => 'Swoft\Bean\Parser\PointAnnotation',
-            Annotation\PointBean::class         => 'Swoft\Bean\Parser\PointBean',
-            Annotation\PointExecution::class    => 'Swoft\Bean\Parser\PointExecution',
+            Annotation\After::class             => 'Swoft\Bean\Annotation\After',
+            Annotation\AfterReturning::class    => 'Swoft\Bean\Annotation\AfterReturning',
+            Annotation\AfterThrowing::class     => 'Swoft\Bean\Annotation\AfterThrowing',
+            Annotation\Around::class            => 'Swoft\Bean\Annotation\Around',
+            Annotation\Aspect::class            => 'Swoft\Bean\Annotation\Aspect',
+            Annotation\Before::class            => 'Swoft\Bean\Annotation\Before',
+            Annotation\PointAnnotation::class   => 'Swoft\Bean\Annotation\PointAnnotation',
+            Annotation\PointBean::class         => 'Swoft\Bean\Annotation\PointBean',
+            Annotation\PointExecution::class    => 'Swoft\Bean\Annotation\PointExecution',
         ];
         foreach ($map as $original => $alias) {
             \class_alias($original, $alias, true);
